@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>شجرة عائلة أحمد بن سعد</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Amiri', serif;
+            background-color: #f8f9fa;
+            overflow: hidden;
+        }
+        #tree-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        .node rect {
+            fill: #4e79a7;
+            stroke: #2c4d6d;
+            stroke-width: 2px;
+            cursor: pointer;
+        }
+        .node text {
+            font-size: 18px;
+            font-weight: bold;
+            fill: white;
+            pointer-events: none;
+        }
+        .surname-rect {
+            fill: white;
+            stroke: #c0392b;
+            stroke-width: 1.5px;
+        }
+        .surname-text {
+            font-size: 12px;
+            fill: #c0392b;
+            font-weight: bold;
+        }
+        .link {
+            fill: none;
+            stroke: #2c4d6d;
+            stroke-width: 2px;
+        }
+        #title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: #5d4037;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+     <!-- <div id="title">
+        <h1>مخطط مبسط لعائلات ذات صلة</h1>
+        <h2>بعائلة أحمد بن سعد</h2>
+      </div> -->
+      
+
+    <div id="tree-container"></div>
+
+    <script>
+        // ==========================================
+        // 1. هيكل البيانات (الشجرة الكاملة)
+        // ==========================================
+        const treeData = {
+            name: "اجحيدر",
+            children: [
+                {
+                    name: "علي",
+                    children: [
+                        {
+                            name: "مبارك",
+                            children: [
+                                { name: "بلقاسم", surname: "لقب قبي - قمار" },
+                                {
+                                    name: "سعد",
+                                    children: [
+                                        {
+                                            name: "فرحات",
+                                            children: [
+                                                { name: "علي", surname: "لقب فرحاتي" },
+                                                { name: "أحمد", surname: "لقب اجحيدر" }
+                                            ]
+                                        },
+                                        {
+                                            name: "احمد",
+                                            children: [
+                                                {
+                                                    name: "الحاج عبد الله", surname: "لقب مفتاح",
+                                                    children: [
+                                                        { name: "حاج البشير", children: [{name:"الصادق"}, {name:"عبد العزيز"}] },
+                                                        { name: "أحمد" },
+                                                        {
+                                                            name: "حاج صالح",
+                                                            children: [
+                                                                { name: "الطاهر", children: [{name:"لخضر"}, {name:"التجاني"}, {name:"إبراهيم"}, {name:"أحمد"}, {name:"عبد العالي"}] },
+                                                                { name: "معمر", children: [{name:"صالح"}, {name:"العيد"}, {name:"عبد المجيد"}] },
+                                                                { name: "عبد الله", children: [{name:"أحمد"}] },
+                                                                { name: "بشير", children: [{name:"سالم"}, {name:"العيد"}, {name:"محمود"}] },
+                                                                { name: "علي", children: [{name:"الطبيب"}, {name:"العيد"}] },
+                                                                { name: "محمد", children: [{name:"إبراهيم"}, {name:"عبد الله"}] },
+                                                                { name: "الصادق", children: [{name:"جمال", children: [{name:"خديجة", gender: "female"},{name:"وئام" ,gender: "female"}, {name:"اسراء", gender: "female"},{name:"اية" ,gender: "female"}, {name:"ريان", gender: "female"}]}, {name:"عبد المجيد", children: [{name:"عبد الرحمان"}, {name:"هناء", gender: "female"},{name:"خديجة" ,gender: "female"}, {name:"رحمة", gender: "female"},{name:"احمد الصادق"}, {name:"عبد الصمد"}]}, {name:"عبد الوهاب", children: [{name:"خديجة", gender: "female"},{name:"مريم" ,gender: "female"}]}, {name:"بلال", children: [{name:"ابراهيم"},{name:"موسى" }]}, {name:"ياسين", children: [{name:"رقية", gender: "female"},{name:"محمدالصادق" },{name:"عبد النور" }]}, {name:"حمزة"}, {name:"محمد البشير"}, {name:"محمد الامين"}] },
+                                                                { name: "مسعود", children: [{name:"صالح", children: [{name:"تميم"},{name:"تيسير" ,gender: "female"}]}, {name:"الهادي", children: [{name:"اسماء", gender: "female"},{name:"خديجة" ,gender: "female"},{name:"خولة", gender: "female"},{name:"رقية" ,gender: "female"},{name:"صفاء", gender: "female"}]}] }
+                                                            ]
+                                                        },
+                                                        { name: "حاج لخضر", children: [{name:"حاج عبد الله", children: [{name:"بشير"}, {name:"لخضر"}, {name:"عبد السلام"}, {name:"عبد المجيد"}, {name:"السعيد"}, {name:"الأمين"}, {name:"سعد"}]}] },
+                                                        { name: "سي محمد", children: [{name:"عبد الباقي", children: [{name:"سي أحمد", children: [{name:"محمد الفاضل"}, {name:"سي عبد الباقي"}]}]}, {name:"حاج علي", children: [{name:"عبد الرحمن", children: [{name:"التجاني"}, {name:"بشير"}]}]}] }
+                                                    ]
+                                                },
+                                                {
+                                                    name: "الحاج الصغير", surname: "لقب مصباحي",
+                                                    children: [
+                                                        {
+                                                            name: "إبراهيم",
+                                                            children: [
+                                                                { name: "جعفر", children: [{name:"لخظر", children: [{name:"عبد المجيد"}, {name:"عبد العزيز"}, {name:"السعيد"}, {name:"محمد الصغير"}, {name:"الطاهر"}]}] },
+                                                                { name: "عبد الله", children: [{name:"السايح", children: [{name:"عبد الله"}]}, {name:"أحمد", children: [{name:"لخضر"}, {name:"سعد"}]}] }
+                                                            ]
+                                                        },
+                                                        { name: "اللي" },
+                                                        { name: "سي عمر لبمم", children: [{name:"محمد"}, {name:"سي علي", children: [{name:"ابراهيم"}, {name:"احمد"}, {name:"عمر"}, {name:"محمد صالح"}]}] },
+                                                        { name: "العربي", children: [{name:"التجاني"}, {name:"البشير"}, {name:"حما الصغير", children: [{name:"احمد"}, {name:"لخظر"}]}, {name:"العيد"}] },
+                                                        { name: "محمد البوهالي", children: [{name:"معمر", children: [{name:"محمد الصغير"}, {name:"بوبكر"}]}, {name:"صالح", children: [{name:"التجاني"}, {name:"محمد العيد"}, {name:"محمد الساسي"}]}] },
+                                                        { name: "عيسى", children: [{name:"محمد لخظر"}, {name:"محمد العيد"}] },
+                                                        { name: "احمد ميدة", children: [{name:"محمد الصغير", children: [{name:"احمد"}, {name:"البشير"}, {name:"ابراهيم"}]}, {name:"مسعود", children: [{name:"محمد"}]}, {name:"محمد الطاهر", children: [{name:"الصادق"}, {name:"قريو"}]}, {name:"سعد"}] }
+                                                    ]
+                                                },
+                                                {
+                                                    name: "الحاج علي", surname: "لقب مصباحي",
+                                                    children: [
+                                                        { name: "سي عمر", children: [{name:"معمر شنس"}, {name:"البشير قنوش"}, {name:"العيد لكزور", children: [{name:"علي شلغوم", children: [{name:"سي الطاهر"}, {name:"عمر"}]}]}] }
+                                                    ]
+                                                },
+                                                { name: "الحاج لخظر", surname: "لقب مصباحي", children: [{name: "أحمد لخضر"}] },
+                                                {
+                                                    name: "الحاج الطاهر", surname: "لقب سعداني",
+                                                    children: [
+                                                        { name: "سي أحمد" },
+                                                        { name: "سي محمد", children: [{name:"صالح"}] },
+                                                        { name: "محمود", children: [{name:"الطاهر"}] }
+                                                    ]
+                                                },
+                                                {
+                                                    name: "سي العيد", surname: "لقب سعداني",
+                                                    children: [
+                                                        { name: "محمد", children: [{name:"محمد العيد"}, {name:"محمد السايح"}, {name:"عثمان"}, {name:"سي محمود"}] },
+                                                        { name: "معمر" },
+                                                        { name: "علي باي", children: [{name:"عبد العزيز"}, {name:"عبد الباقي"}, {name:"عبد المجيد"}] },
+                                                        { name: "ابراهيم" },
+                                                        { name: "احمد", children: [{name:"سعد"}, {name:"البشير"}, {name:"عمار"}, {name:"خليفة"}, {name:"صالح"}, {name:"سالم"}] },
+                                                        { name: "لخظر", children: [{name:"ميلود"}, {name:"محمد علي"}, {name:"العيد"}, {name:"عبد المجيد"}, {name:"الحبيب"}, {name:"الطاهر"}, {name:"التجاني"}, {name:"الصادق"}] }
+                                                    ]
+                                                },
+                                                {
+                                                    name: "العربي", surname: "لقب كرام",
+                                                    children: [
+                                                        {
+                                                            name: "أحمد / عبد الله",
+                                                            children: [
+                                                                { name: "الطيب", children: [{name:"صلاح الدين"}, {name:"رشيد"}, {name:"سامي"}, {name:"عبد العالي"}, {name:"محمد العيد"}, {name:"السعيد"}] },
+                                                                { name: "محمد لخضر", children: [{name:"أحمد"}, {name:"خالد"}, {name:"بوبكر"}, {name:"عثمان"}, {name:"عمر"}, {name:"علي"}] },
+                                                                { name: "معمر", children: [{name:"مدني"}] },
+                                                                { name: "الصادق", children: [{name:"عبد العزيز"}, {name:"أحمد"}, {name:"علي"}, {name:"الصغير"}, {name:"لمين"}] },
+                                                                { name: "محمد الصغير", children: [{name:"محمد علي"}, {name:"أحمد"}, {name:"محمد الناصر"}, {name:"العروسي"}] },
+                                                                { name: "محمد العيد", children: [{name:"عبد الكريم"}, {name:"محمد علي"}, {name:"الهادي"}, {name:"محمد الناصر"}, {name:"عبد الحميد"}] },
+                                                                { name: "العربي", children: [{name:"إبراهيم"}, {name:"بشير"}, {name:"التجاني"}, {name:"عبد الله"}, {name:"عبد الباقي"}] }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        { name: "محمد", surname: "لقب سعد الله" }
+                                    ]
+                                },
+                                { name: "علي", surname: "لقب قبي - توزر" }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // ==========================================
+        // 2. إعدادات لوحة الرسم
+        // ==========================================
+        const container = document.getElementById('tree-container');
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+
+        const svg = d3.select("#tree-container").append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .call(d3.zoom().on("zoom", (event) => {
+                svgGroup.attr("transform", event.transform);
+            }))
+            .append("g");
+
+        const svgGroup = svg.append("g")
+            .attr("transform", `translate(${width / 2}, 150)`);
+
+        // ==========================================
+        // 3. محرك الشجرة
+        // ==========================================
+        const nodeWidth = 100;
+        const nodeHeight = 40;
+        const treemap = d3.tree().nodeSize([150, 100]); 
+
+        let root = d3.hierarchy(treeData, d => d.children);
+        root.x0 = 0;
+        root.y0 = 0;
+
+        let i = 0;
+
+        root.children.forEach(collapse);
+
+        function collapse(d) {
+            if(d.children) {
+                d._children = d.children;
+                d._children.forEach(collapse);
+                d.children = null;
+            }
+        }
+
+        update(root);
+
+        // ==========================================
+        // 4. دالة التحديث
+        // ==========================================
+        function update(source) {
+            const treeData = treemap(root);
+            const nodes = treeData.descendants();
+            const links = treeData.links();
+
+            const link = svgGroup.selectAll('path.link')
+                .data(links, d => d.target.id);
+
+            const linkEnter = link.enter().insert('path', "g")
+                .attr("class", "link")
+                .attr('d', d => {
+                    const o = {x: source.x0, y: source.y0};
+                    return diagonal(o, o);
+                });
+
+            const linkUpdate = linkEnter.merge(link);
+            linkUpdate.transition().duration(750)
+                .attr('d', d => diagonal(d.source, d.target));
+
+            const linkExit = link.exit().transition().duration(750)
+                .attr('d', d => {
+                    const o = {x: source.x, y: source.y};
+                    return diagonal(o, o);
+                })
+                .remove();
+
+            const node = svgGroup.selectAll('g.node')
+                .data(nodes, d => d.id || (d.id = ++i));
+
+            const nodeEnter = node.enter().append('g')
+                .attr('class', 'node')
+                .attr("transform", d => `translate(${source.x0}, ${source.y0})`)
+                .on('click', click);
+
+            nodeEnter.append('rect')
+                .attr('class', 'main-rect')
+                .attr('width', nodeWidth)
+                .attr('height', nodeHeight)
+                .attr('x', -nodeWidth / 2)
+                .attr('y', -nodeHeight / 2)
+                .attr('rx', 5);
+
+            nodeEnter.append('text')
+                .attr("dy", ".35em")
+                .attr("text-anchor", "middle")
+                .text(d => d.data.name);
+
+            const surnameGroup = nodeEnter.filter(d => d.data.surname).append("g")
+                .attr("transform", `translate(0, ${nodeHeight/2 + 15})`);
+
+           // رسم إطار اللقب
+             surnameGroup.append('rect')
+                 .attr('class', 'surname-rect')
+                 .attr('width', 110)
+                 .attr('height', 25)
+                 .attr('x', -55)
+                 .attr('y', -12.5)
+                 .attr('rx', 3)
+                 // السطر الجديد لتغيير لون الإطار:
+                 .style('stroke', d => d.data.surnameColor ? d.data.surnameColor : '#c0392b');
+ 
+             // كتابة نص اللقب
+             surnameGroup.append('text')
+                 .attr('class', 'surname-text')
+                 .attr("dy", ".35em")
+                 .attr("text-anchor", "middle")
+                 // السطر الجديد لتغيير لون النص:
+                 .style('fill', d => d.data.surnameColor ? d.data.surnameColor : '#000000')
+                 .text(d => d.data.surname);
+ 
+            const nodeUpdate = nodeEnter.merge(node);
+            nodeUpdate.transition().duration(750)
+                .attr("transform", d => `translate(${d.x}, ${d.y})`);
+
+            nodeUpdate.select('rect.main-rect')
+                .style("fill", d => {
+                    // إذا كان الصندوق مغلقاً (يحتوي على أبناء مخفيين)
+                    if (d._children) {
+                        return d.data.gender === "female" ? "#c82a5d" : "#c0392b"; // أحمر مائل للوردي للبنات، أحمر عادي للأولاد
+                    }
+                    // إذا كان الصندوق مفتوحاً أو ليس لديه أبناء (اللون الأساسي)
+                    return d.data.gender === "female" ? "#e84393" : "#4e79a7"; // وردي للبنات، أزرق للأولاد
+                });
+
+            const nodeExit = node.exit().transition().duration(750)
+                .attr("transform", d => `translate(${source.x}, ${source.y})`)
+                .remove();
+
+            nodes.forEach(d => {
+                d.x0 = d.x;
+                d.y0 = d.y;
+            });
+
+            function diagonal(s, d) {
+                return `M ${s.x} ${s.y}
+                        V ${(s.y + d.y) / 2}
+                        H ${d.x}
+                        V ${d.y}`;
+            }
+        }
+
+        function click(event, d) {
+            if (d.children) {
+                d._children = d.children;
+                d.children = null;
+            } else {
+                d.children = d._children;
+                d._children = null;
+            }
+            update(d);
+        }
+    </script>
+</body>
+</html>
